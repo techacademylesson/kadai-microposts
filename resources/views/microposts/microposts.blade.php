@@ -1,4 +1,4 @@
-@if (count($microposts) > 0)
+@if (isset($microposts))
     <ul class="list-unstyled">
         @foreach ($microposts as $micropost)
             <li class="media mb-3">
@@ -14,13 +14,19 @@
                         {{-- 投稿内容 --}}
                         <p class="mb-0">{!! nl2br(e($micropost->content)) !!}</p>
                     </div>
-                    <div>
-                        @if (Auth::id() == $micropost->user_id)
-                            {{-- 投稿削除ボタンのフォーム --}}
-                            {!! Form::open(['route' => ['microposts.destroy', $micropost->id], 'method' => 'delete']) !!}
-                                {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
-                            {!! Form::close() !!}
-                        @endif
+                    <div class="d-flex">
+                        <div class="mr-2">
+                            {{-- お気に入り登録ボタン --}}
+                            @include('microposts.favorite_button')
+                        </div>
+                        <div>
+                            @if (Auth::id() == $micropost->user_id)
+                                {{-- 投稿削除ボタンのフォーム --}}
+                                {!! Form::open(['route' => ['microposts.destroy', $micropost->id], 'method' => 'delete']) !!}
+                                    {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
+                                {!! Form::close() !!}
+                            @endif
+                        </div>
                     </div>
                 </div>
             </li>

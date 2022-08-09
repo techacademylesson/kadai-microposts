@@ -52,7 +52,7 @@ class User extends Authenticatable
     // このユーザをフォロー中のユーザ（Userモデルとの関係を定義）
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'user_follow', 'user_id', 'follow_id')->withTimestamps();
+        return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
     }
     
     // このユーザに関係するモデルの件数をロードする
@@ -136,5 +136,32 @@ class User extends Authenticatable
         return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
     }
     
-    // 
+    // $micropostIdで指定された投稿をお気に入り登録する
+    public function favorite($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+        if ($exist) {
+            return false;
+        } else {
+            $this->favorites()->attach($micropostId);
+            return true;
+        }
+    }
+    
+    // $micropostIdで指定された投稿のお気に入り登録を外す
+    public function unfavorite($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+        if ($exist) {
+            $this->favorites()->detach($micropostId);
+        } else {
+            return false;
+        }
+    }
+    
+        // このユーザが$micropostIdで指定された投稿をお気に入り登録しているか調べる
+        public function is_favorite($micropostId)
+        {
+            return $this->favorites()->where('micropost_id', $micropostId)->exists();
+        }
 }
